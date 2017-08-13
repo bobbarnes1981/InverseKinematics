@@ -14,6 +14,35 @@ namespace InverseKinematics
             BC = bc;
         }
 
+        public double[] SolveArduinoStyle(double x, double y, double z)
+        {
+            double[] servos = new double[3];
+
+            double newX = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2));
+
+            double newY = z;
+
+            double AC = Math.Sqrt(Math.Pow(newX, 2) + Math.Pow(newY, 2));
+            double ac_angle = radiansToDegrees(Math.Atan(newY / newX));
+
+            //s=(AB+BC+AC)/2
+            double s = (AB + BC + AC) / 2;
+
+            //S=sqr(s*(s-AB)(s-BC)(s-AC))
+            double S = Math.Sqrt(s * (s - AB) * (s - BC) * (s - AC));
+
+            //A=asin(2S/(AB*AC))
+            double A = radiansToDegrees(Math.Asin((2 * S) / (AB * AC)));
+            //B=asin(2S/(AB*BC))
+            double B = radiansToDegrees(Math.Asin((2 * S) / (AB * BC)));
+
+            servos[0] = radiansToDegrees(Math.Atan(y / x));
+            servos[1] = ac_angle + A;
+            servos[2] = B;
+
+            return servos;
+        }
+
         public Servos Solve(double tx, double ty, double tz)
         {
             return Solve3DOF(tx, ty, tz);
