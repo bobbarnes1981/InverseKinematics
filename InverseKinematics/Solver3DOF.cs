@@ -10,8 +10,13 @@ namespace InverseKinematics
 
         private Servo[] m_servos = new Servo[]
         {
-            new Servo { Min = -90, Max = +90 },
-            new Servo { Min = -45, Max = +90 },
+            // restrict hip front/back movement +/-45
+            new Servo { Min = -45, Max = +45 },
+            // restrict hip up/down +80/-45, top limits stops me having to 
+            // deal with law of cosines, bottom limit is hardware related
+            new Servo { Min = -45, Max = +80 },
+            // knee up/down +45/+170, lower limit is hardware related,
+            // upper limit is just below fully extended
             new Servo { Min = +45, Max = +170 }
         };
 
@@ -60,8 +65,8 @@ namespace InverseKinematics
             double B = radiansToDegrees(Math.Asin((2 * S) / (AB * BC)));
 
             // Check if Hypoteneuse (AC) is big enough to mean triangle is obtuse
-            // for some reason angle B went between 0-90 the back again instead
-            // of 0-180. Can we just use a different equation to B=asin(2S/(AB*BC))?
+            // as rule of sines doesn't work on obtuse angles, could use rule of
+            // cosines
             if (AC > Math.Sqrt(Math.Pow(AB, 2) + Math.Pow(BC, 2)))
             {
                 B = 180 - B;

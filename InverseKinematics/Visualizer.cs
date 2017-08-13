@@ -192,22 +192,24 @@ namespace InverseKinematics
             drawGrid(topA.X - gridStep, topA.Y - (gridSize / 2), gridSize, gridStep, "Z plane (above)");
 
             // knee (B) (top)
-            double top_bx = side_bx;
-            double top_by = Math.Tan(degreesToRadians(s[0].Angle)) * top_bx; // o = tan(theta) * a
+            double top_bh = side_bx;
+            double top_bx = Math.Cos(degreesToRadians(s[0].Angle)) * top_bh; // cos(theta) * h = a
+            double top_by = Math.Sin(degreesToRadians(s[0].Angle)) * top_bh; // sin(theta) * h = o
             Point topB = new Point((int)(top_bx * m_multiplier) + topA.X, topA.Y - (int)(top_by * m_multiplier));
 
             // foot (C) (top)
-            double top_cx = m_simulator.X;//cx - bx;
-            double top_cy = m_simulator.Y;//Math.Tan(degreesToRadians(s.Servo0)) * topcx; // o = tan(theta) * a
+            double top_ch = side_cx;
+            double top_cx = Math.Cos(degreesToRadians(s[0].Angle)) * top_ch; // cos(theta) * h = a
+            double top_cy = Math.Sin(degreesToRadians(s[0].Angle)) * top_ch; // sin(theta) * h = o
             Point topC = new Point((int)(top_cx * m_multiplier) + topA.X, topA.Y - (int)(top_cy * m_multiplier));
-
-            // draw AB (top)
-            m_video.Draw(new Line(topA, topB), Color.Red, true);
-            m_video.Blit(m_font.Render(string.Format("({0:0.0},{1:0.0}) {2:0.00}°", 0, 0, s[0].Angle), Color.Red), topA);
 
             // draw BC (top)
             m_video.Draw(new Line(topB, topC), Color.Blue, true);
             m_video.Blit(m_font.Render(string.Format("({0:0.0},{1:0.0})", top_bx, top_by), Color.Blue), new Point(topB.X, topB.Y-20));
+
+            // draw AB (top) - draw after BC so it appears on top of
+            m_video.Draw(new Line(topA, topB), Color.Red, true);
+            m_video.Blit(m_font.Render(string.Format("({0:0.0},{1:0.0}) {2:0.00}°", 0, 0, s[0].Angle), Color.Red), topA);
 
             // draw AC (top)
             m_video.Blit(m_font.Render(string.Format("({0:0.0},{1:0.0})", top_cx, top_cy), Color.Green), topC);
