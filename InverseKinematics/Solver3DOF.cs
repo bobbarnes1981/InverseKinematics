@@ -8,65 +8,38 @@ namespace InverseKinematics
 
         private double BC;
 
+        private Servo[] m_servos = new Servo[]
+        {
+            new Servo { Min = -90, Max = +90 },
+            new Servo { Min = -45, Max = +90 },
+            new Servo { Min = +45, Max = +170 }
+        };
+
         public Solver3DOF(double ab, double bc)
         {
             AB = ab;
             BC = bc;
         }
 
-        public double[] SolveArduinoStyle(double x, double y, double z)
+        public Servo[] Solve(double tx, double ty, double tz)
         {
-            double[] servos = new double[3];
+            Solve3DOF(tx, ty, tz);
 
-            double newX = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2));
-
-            double newY = z;
-
-            double AC = Math.Sqrt(Math.Pow(newX, 2) + Math.Pow(newY, 2));
-            double ac_angle = radiansToDegrees(Math.Atan(newY / newX));
-
-            //s=(AB+BC+AC)/2
-            double s = (AB + BC + AC) / 2;
-
-            //S=sqr(s*(s-AB)(s-BC)(s-AC))
-            double S = Math.Sqrt(s * (s - AB) * (s - BC) * (s - AC));
-
-            //A=asin(2S/(AB*AC))
-            double A = radiansToDegrees(Math.Asin((2 * S) / (AB * AC)));
-            //B=asin(2S/(AB*BC))
-            double B = radiansToDegrees(Math.Asin((2 * S) / (AB * BC)));
-
-            servos[0] = radiansToDegrees(Math.Atan(y / x));
-            servos[1] = ac_angle + A;
-            servos[2] = B;
-
-            return servos;
-        }
-
-        public Servos Solve(double tx, double ty, double tz)
-        {
-            return Solve3DOF(tx, ty, tz);
+            return m_servos;
         }
 
         // x-side, y-forward, z-up
-        private Servos Solve3DOF(double tx, double ty, double tz)
+        private void Solve3DOF(double tx, double ty, double tz)
         {
-            double servo0 = radiansToDegrees(Math.Atan(ty / tx));
+            m_servos[0].Angle = radiansToDegrees(Math.Atan(ty / tx));
 
             double AT = Math.Sqrt(Math.Pow(tx, 2) + Math.Pow(ty, 2));
 
-            Tuple<double, double> servo1and2 = Solve2DOF(AT, tz);
-
-            return new Servos
-            {
-                Servo0 = servo0,
-                Servo1 = servo1and2.Item1,
-                Servo2 = servo1and2.Item2
-            };
+            Solve2DOF(AT, tz);
         }
 
         // x-side, y-up
-        private Tuple<double, double> Solve2DOF(double tx, double ty)
+        private void Solve2DOF(double tx, double ty)
         {
             double cx = tx;
             double cy = ty;
@@ -81,11 +54,22 @@ namespace InverseKinematics
             double S = Math.Sqrt(s * (s - AB) * (s - BC) * (s - AC));
 
             //A=asin(2S/(AB*AC))
-            double A = radiansToDegrees(Math.Asin((2 * S) / (AB * AC)));
+            double A = radiansToDegrees(Math.Asin((2 * S) / (AB * AC)));
+
             //B=asin(2S/(AB*BC))
             double B = radiansToDegrees(Math.Asin((2 * S) / (AB * BC)));
 
-            return new Tuple<double, double>(ac_angle + A, B);
+            // Check if Hypoteneuse (AC) is big enough to mean triangle is obtuse
+            // for some reason angle B went between 0-90 the back again instead
+            // of 0-180. Can we just use a different equation to B=asin(2S/(AB*BC))?
+            if (AC > Math.Sqrt(Math.Pow(AB, 2) + Math.Pow(BC, 2)))
+            {
+                B = 180 - B;
+            }
+
+            m_servos[1].Angle = ac_angle + A;
+
+            m_servos[2].Angle = B;
         }
 
         private double radiansToDegrees(double radians)

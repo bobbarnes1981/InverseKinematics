@@ -60,9 +60,9 @@
                     {
                         case Direction.B:
                             Y += (m_speed * seconds);
-                            if (Y > 1)
+                            if (Y > 2)
                             {
-                                Y = 1;
+                                Y = 2;
                                 m_direction = Direction.F;
                             }
                             break;
@@ -102,10 +102,17 @@
             }
         }
 
-        public Servos GetServos()
+        public void Update(float seconds, float x, float y, float z)
+        {
+            X += seconds * m_speed * x;
+            Y += seconds * m_speed * y;
+            Z += seconds * m_speed * z;
+        }
+
+        public Servo[] GetServos()
         {
             // 1 width, 1 depth, 0 height
-            Servos servos = m_solver.Solve(X, Y, Z);
+            Servo[] servos = m_solver.Solve(X, Y, Z);
 
             return servos;
         }
