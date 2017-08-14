@@ -1,7 +1,12 @@
 #include "Arduino.h"
 #include "RobotLeg.h"
 #include "RobotServo.h"
-  
+
+// hip back/forward centre is 90
+double servo0_offset = 90;
+// hip up/down centre is 90
+double servo1_offset = 90;
+
 RobotLeg::RobotLeg(double ab_length, double bc_length)
 {
   ab_length = ab_length;
@@ -20,7 +25,7 @@ void RobotLeg::Solve(double x, double y, double z)
 // target x-side y-forward z-up
 void RobotLeg::solve3DOF(double tx, double ty, double tz)
 {
-  Servo0.Angle = this->radToDeg(atan(ty / tx));
+  Servo0.Angle = this->radToDeg(atan(ty / tx)) + servo0_offset;
 
   double AT = sqrt(pow(tx, 2) + pow(ty, 2));
 
@@ -55,7 +60,7 @@ void RobotLeg::solve2DOF(double tx, double ty)
     B = 180 - B;
   }
 
-  Servo1.Angle = ac_angle + A;
+  Servo1.Angle = ac_angle + A + servo1_offset;
 
   Servo2.Angle = B;
 }

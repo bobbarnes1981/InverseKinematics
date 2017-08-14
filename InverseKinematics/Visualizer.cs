@@ -218,14 +218,14 @@ namespace InverseKinematics
             m_video.Blit(m_font.Render("Inverse Kinematics", Color.White), new Point(50, 50));
             m_video.Blit(m_font.Render(string.Format("Location (w,d,h) {0:0.0},{1:0.0},{2:0.0}", m_simulator.X, m_simulator.Y, m_simulator.Z), Color.White), new Point(50, 70));
 
-            m_video.Blit(m_font.Render(string.Format("s0 (front/back hip) {0:0.00}°", s[0].Angle), Color.White, s[0].Valid ? Color.Black : Color.Red), new Point(50, 90));
-            m_video.Blit(m_font.Render(string.Format("s1 (up/down hip) {0:0.00}°", s[1].Angle), Color.White, s[1].Valid ? Color.Black : Color.Red), new Point(50, 110));
+            m_video.Blit(m_font.Render(string.Format("s0 (front/back hip) {0:0.00}°", s[0].Angle + 90), Color.White, s[0].Valid ? Color.Black : Color.Red), new Point(50, 90));
+            m_video.Blit(m_font.Render(string.Format("s1 (up/down hip) {0:0.00}°", s[1].Angle + 90), Color.White, s[1].Valid ? Color.Black : Color.Red), new Point(50, 110));
             m_video.Blit(m_font.Render(string.Format("s2 (up/down knee) {0:0.00}°", s[2].Angle), Color.White, s[2].Valid ? Color.Black : Color.Red), new Point(50, 130));
 
             m_video.Blit(m_font.Render(string.Format("Origin location (a) {0:0.0},{1:0.0}", 0, 0), Color.White), new Point(300, 70));
             m_video.Blit(m_font.Render(string.Format("Knee location (b) {0:0.0},{1:0.0}", side_bx, side_by), Color.White), new Point(300, 90));
             m_video.Blit(m_font.Render(string.Format("Foot location (c) {0:0.0},{1:0.0}", side_cx, side_cy), Color.White), new Point(300, 110));
-            m_video.Blit(m_font.Render(string.Format("ac_angle {0:0.00}°", s[1].Angle - s[2].Angle), Color.Green), new Point(300, 130));
+            m_video.Blit(m_font.Render(string.Format("ac_angle {0:0.00}°", 180 - (s[1].Angle + s[2].Angle)), Color.Green), new Point(300, 130));
             m_video.Blit(m_font.Render(string.Format("ab_angle {0:0.00}°", s[1].Angle), Color.Red), new Point(300, 150));
             m_video.Blit(m_font.Render(string.Format("bc_angle {0:0.00}°", s[2].Angle), Color.Blue), new Point(300, 170));
 
